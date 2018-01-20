@@ -26,18 +26,14 @@ class VolumeController extends Controller
     public function getAllVolumeSymbol($symbol)
     {
     	$api = new API(Config::get('constants.API_KEY'), Config::get('constants.SECRET'));
-    	$ticks = $api->candlesticks($symbol, "1m");
-    	return view('volume', compact(['ticks', 'symbol']));
+    	$prevDay = $api->prevDay($symbol);
+        return view('volume',compact(['symbol', 'prevDay']));
     }
 
     public function getVolumeSymbol(Request $request)
     {
     	$api = new API(Config::get('constants.API_KEY'), Config::get('constants.SECRET'));
-    	$ticks = $api->candlesticks($request->symbol, "1m");
-    	$data = [];
-    	$time = \Carbon\Carbon::parse(now())->format('d-m-Y H:i');
-    	$time = strtotime($time)*1000;
-		$data[$request->symbol] = $ticks[$time]['volume'];
-    	return response()->json(['volume' => $data]);
+        $prevDay = $api->prevDay($request->symbol);
+    	return response()->json(['volume' => $prevDay]);
     }
 }
